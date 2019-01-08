@@ -1,0 +1,4 @@
+#Sat Dec 15 15:15:20 PST 2018
+base.0=/Users/student/ftc/2018-19-competition/ftc_app-master/TeamCode/build/intermediates/transforms/dexMerger/debug/0
+path.0=classes.dex
+renamed.0=classes.dex
