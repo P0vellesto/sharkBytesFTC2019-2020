@@ -73,7 +73,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
     private Servo sBoxWheel = null; // servo that turns the wheel in the box
 
     boolean aPressed = false;
-    boolean sensitivity = false; // if true, the drive train is half speed
+    //boolean sensitivity = false; // if true, the drive train is half speed
     int sensitivityValue = 1;
     boolean sensitivitySwitch = false; // used to limit the switching of sensitivity to once per second
 
@@ -255,6 +255,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
     }
     public void mecPowerEasy(double dirX, double dirY, double power)
     {
+        // important: power is always positive
         boolean turning = false;
         if (gamepad1.right_bumper)
         {
@@ -282,46 +283,59 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 mDrv_r0.setPower(power);
                 mDrv_r1.setPower(power);
             }
-            if (direction == "left")
+            else if (direction == "left")
             {
                 mDrv_l0.setPower(-power);
                 mDrv_l1.setPower(power);
                 mDrv_r0.setPower(power);
                 mDrv_r1.setPower(-power);
             }
-            if (direction == "right")
+            else if (direction == "right")
             {
                 mDrv_l0.setPower(power);
                 mDrv_l1.setPower(-power);
                 mDrv_r0.setPower(-power);
                 mDrv_r1.setPower(power);
             }
-            if (direction == "left-forward")
+            // 0 is front 1 is back
+            else if (direction == "left-forward")
             {
-
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(power);
+                mDrv_r0.setPower(power);
+                mDrv_r1.setPower(0);
             }
-            if (direction == "left-backward")
+            else if (direction == "left-backward")
             {
-
+                mDrv_l0.setPower(-power);
+                mDrv_l1.setPower(0);
+                mDrv_r0.setPower(0);
+                mDrv_r1.setPower(-power);
             }
-            if (direction == "right-forward")
+            else if (direction == "right-forward")
             {
                 mDrv_l0.setPower(power);
                 mDrv_r1.setPower(power);
                 mDrv_l1.setPower(0);
                 mDrv_r0.setPower(0);
             }
-            if (direction == "right-backward")
+            else if (direction == "right-backward")
             {
-
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(-power);
+                mDrv_r0.setPower(-power);
+                mDrv_r1.setPower(0);
             }
         }
     }
+    // is used for MecPowerEasy
     public String evaluateDirection(double dirX, double dirY)
     {
         String direction = "uknown";
         boolean notForOrBack = true;
         boolean directionSet = false;
+
+        // figure out if the general direction is not forward or backward, forward, or backward
         if (dirY <= 0.5 && dirY >= -0.5)
         {
             notForOrBack = true;
@@ -336,6 +350,8 @@ public class Mecanum_TeleOp extends LinearOpMode {
             notForOrBack = false;
             direction = "backward";
         }
+
+        // if it's to the left
         if (dirX <= -0.5)
         {
             if (notForOrBack)
@@ -351,7 +367,8 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "left-backward";
             }
         }
-        if (dirX >= 0.5)
+        // if it's to the right
+        else if (dirX >= 0.5)
         {
             if (notForOrBack)
             {
@@ -366,6 +383,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "right-backward";
             }
         }
+
         return direction;
     }
 
@@ -432,6 +450,10 @@ public class Mecanum_TeleOp extends LinearOpMode {
             dirX = gamepad1.right_stick_x;
             dirY = gamepad1.right_stick_y;
             power = gamepad1.left_stick_y;
+            if (power < 0)
+            {
+                power = -power;
+            }
 
             pinPower = gamepad2.left_stick_y;
             boxPower = gamepad2.left_stick_x;
