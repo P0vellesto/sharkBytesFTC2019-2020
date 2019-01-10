@@ -61,8 +61,8 @@ public class mecanum_auto extends LinearOpMode {
     private DcMotor mDrv_r0 = null;
     private DcMotor mDrv_r1 = null;
 
-    DcMotor[] mDrv_l = new DcMotor[]{ mDrv_l0, mDrv_l1 };
-    DcMotor[] mDrv_r = new DcMotor[]{ mDrv_r0, mDrv_r1 };
+    //DcMotor[] mDrv_l = new DcMotor[]{ mDrv_l0, mDrv_l1 };
+    //DcMotor[] mDrv_r = new DcMotor[]{ mDrv_r0, mDrv_r1 };
 
     public void runMotors(DcMotor[] motors, double[] power, double holdTime)
     { // take an array of motors and powers and drive those motors at that power for holdTime
@@ -144,18 +144,40 @@ public class mecanum_auto extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        // crater pseudo code:
+        /*
+        raise rack to lower robot
+        move slightly to unhook
+        forward right diagonal to first sample
+        check sample
+        horizontal left to second sample
+        check sample
+        horizontal left to third sample
+        check sample
+        move horizontal left till you are at the end of the crater, at the wall
+        turn right 45 degrees so that you face the wall
+        move horizontal left to depo
+        drop marker
+        move horizontal right to crater and park
+         */
+        // depo pseudo code
+        /*
+        raise rack to lower robot
+        move slightly to unhook
+        forward right diagonal to first sample
+        check sample
+        horizontal left to second sample
+        check sample
+        horizontal left to third sample
+        check sample
+        horizontal left until you are at the wall to the left of the depo
+        turn right 45 degrees so that you face the wall
+        move horizontal right to go into depo
+        drop marker
+        move horizontal left to crater and park
+         */
 
-            // TODO: add the actual auto and also get the vars for holdtime to distance/rotation
-            
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
+        // TODO: add the actual auto and also get the vars for holdtime to distance/rotation
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", 0, 0);
-            telemetry.update();
-        }
     }
 }
