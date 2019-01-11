@@ -144,6 +144,18 @@ public class mecanum_auto extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        shift_f(1, 1);
+        shift_b(1, 1);
+        shift_l(1, 1);
+        shift_r(1, 1);
+        shift_fl(1, 1);
+        shift_br(1, 1);
+        shift_fr(1, 1);
+        shift_bl(1, 1);
+        turnRight(1, 1);
+        turnLeft(1, 1);
+        
+        
         // crater pseudo code:
         /*
         raise rack to lower robot
