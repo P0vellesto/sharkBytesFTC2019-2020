@@ -176,7 +176,7 @@ public class mecanum_auto extends LinearOpMode {
 
         double debug_hold = 5;
 
-        shift_f(1, debug_hold); pause(1);
+        shift_f(1, debug_hold*4); pause(1);
         shift_b(1, debug_hold); pause(1);
         shift_l(1, debug_hold); pause(1);
         shift_r(1, debug_hold); pause(1);
