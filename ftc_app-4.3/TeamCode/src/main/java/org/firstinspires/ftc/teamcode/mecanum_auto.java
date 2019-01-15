@@ -66,7 +66,7 @@ public class mecanum_auto extends LinearOpMode {
 
     public void runMotors(DcMotor[] motors, double[] power, double holdTime)
     { // take an array of motors and powers and drive those motors at that power for holdTime
-        for (int i = 0; i < motors.length; i++) { motors[i].setPower(power[i%power.length]); } // set power to all motors
+        for (int i = 0; i < motors.length; i++) { motors[i].setPower(power[i%(power.length-1)]); } // set power to all motors
 
         ElapsedTime holdTimer = new ElapsedTime(); // make a timer
         holdTimer.reset(); // set to 0
@@ -104,19 +104,19 @@ public class mecanum_auto extends LinearOpMode {
     };
 
     // diagonal shifting
-    public void shift_lf(double power, double holdTime)
+    public void shift_fl(double power, double holdTime)
     { // diagonal shift left and forwards
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l1 }, new double[]{ power }, holdTime); // run the motors
     };
-    public void shift_rf(double power, double holdTime)
+    public void shift_fr(double power, double holdTime)
     { // diagonal shift right and forwards
         runMotors(new DcMotor[]{ mDrv_r1, mDrv_l0 }, new double[]{ power }, holdTime); // run the motors
     };
-    public void shift_lb(double power, double holdTime)
+    public void shift_bl(double power, double holdTime)
     { // diagonal shift left and backwards
         runMotors(new DcMotor[]{ mDrv_r1, mDrv_l0 }, new double[]{ -power }, holdTime); // run the motors
     };
-    public void shift_rb(double power, double holdTime)
+    public void shift_br(double power, double holdTime)
     { // diagonal shift right and backwards
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l1 }, new double[]{ -power }, holdTime); // run the motors
     };
@@ -154,8 +154,8 @@ public class mecanum_auto extends LinearOpMode {
         shift_bl(1, 1);
         turnRight(1, 1);
         turnLeft(1, 1);
-        
-        
+
+
         // crater pseudo code:
         /*
         raise rack to lower robot
