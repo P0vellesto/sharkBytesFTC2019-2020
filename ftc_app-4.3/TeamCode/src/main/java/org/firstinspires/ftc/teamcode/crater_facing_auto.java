@@ -17,6 +17,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+@Disabled
 @Autonomous(name="Crater Unhook Odometry", group="Odometry")
 public class crater_facing_auto extends LinearOpMode {
     /* Declare OpMode members. */

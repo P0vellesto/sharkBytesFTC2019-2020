@@ -66,7 +66,7 @@ public class mecanum_auto extends LinearOpMode {
 
     public void runMotors(DcMotor[] motors, double[] power, double holdTime)
     { // take an array of motors and powers and drive those motors at that power for holdTime
-        for (int i = 0; i < motors.length; i++) { motors[i].setPower(power[i%(power.length-1)]); } // set power to all motors
+        for (int i = 0; i < motors.length; i++) { motors[i].setPower(power[(i+1)%(power.length)]); } // set power to all motors
 
         ElapsedTime holdTimer = new ElapsedTime(); // make a timer
         holdTimer.reset(); // set to 0
@@ -78,46 +78,56 @@ public class mecanum_auto extends LinearOpMode {
     // turn
     public void turnRight(double power, double holdTime)
     { // turn right for holdTime at power
+        telemetry.addData("Turn Right",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ power, -power }, holdTime); // run the motors
     };
     public void turnLeft(double power, double holdTime)
     { // turn left for holdTime at power
+        telemetry.addData("Turn Left",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ -power, power }, holdTime); // run the motors
     };
 
     // lattice shifting
     public void shift_f(double power, double holdTime)
     { // move forward for holdTime at power
+        telemetry.addData("Shift Forwards",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ power }, holdTime); // run the motors
     };
     public void shift_b(double power, double holdTime)
     { // move backward for holdTime at power
+        telemetry.addData("Shift Backwards",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ -power }, holdTime); // run the motors
     };
     public void shift_l(double power, double holdTime)
     { // shift left for holdTime at power
+        telemetry.addData("Shift Left",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l0, mDrv_l1, mDrv_r0 }, new double[]{ power, -power }, holdTime); // run the motors
     };
     public void shift_r(double power, double holdTime)
     { // shift right for holdTime at power
+        telemetry.addData("Shift Right",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l0, mDrv_l1, mDrv_r0 }, new double[]{ -power, power }, holdTime); // run the motors
     };
 
     // diagonal shifting
     public void shift_fl(double power, double holdTime)
     { // diagonal shift left and forwards
+        telemetry.addData("Shift Front Left",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l1 }, new double[]{ power }, holdTime); // run the motors
     };
     public void shift_fr(double power, double holdTime)
     { // diagonal shift right and forwards
+        telemetry.addData("Shift Front Right",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r1, mDrv_l0 }, new double[]{ power }, holdTime); // run the motors
     };
     public void shift_bl(double power, double holdTime)
     { // diagonal shift left and backwards
+        telemetry.addData("Shift Back Left",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r1, mDrv_l0 }, new double[]{ -power }, holdTime); // run the motors
     };
     public void shift_br(double power, double holdTime)
     { // diagonal shift right and backwards
+        telemetry.addData("Shift Back Right",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l1 }, new double[]{ -power }, holdTime); // run the motors
     };
     @Override
@@ -191,5 +201,6 @@ public class mecanum_auto extends LinearOpMode {
 
         // TODO: add the actual auto and also get the vars for holdtime to distance/rotation
 
+        telemetry.update();
     }
 }

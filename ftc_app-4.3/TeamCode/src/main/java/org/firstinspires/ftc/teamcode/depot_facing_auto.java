@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import java.util.ArrayList;
 
+@Disabled
 @Autonomous(name="Depot Unhook Odometry", group="Odometry")
 public class depot_facing_auto extends LinearOpMode {
     /* Declare OpMode members. */

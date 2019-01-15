@@ -91,7 +91,7 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-
+@Disabled
 @Autonomous(name="Concept: Vuforia Rover Nav", group ="Concept") // this should be auto, right? changed from teleop by albert 3 dec 2018
 //@Disabled // TODO: things that are freaking disabled dont show up on the phone, btw
 public class LiviVuforiaIntermediate extends LinearOpMode {
