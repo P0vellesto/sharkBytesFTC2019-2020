@@ -1,8 +1,10 @@
-//ur mom gay
+
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -10,13 +12,13 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-
-@TeleOp
+//@Disabled
+@Autonomous(name="Tensor (Single)", group="Tensor")
 public class TensorFlowObjectDetectionLivi extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
-    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+    private static final String VUFORIA_KEY = "AXintg3/////AAABmfNtfFit30hUjY6OwyDJ+ApUdprK4NLN3D7Fo0PdokHRKNToq2vdRLN6q9SaOptQwr7stamCCbjslhfHa4xoVwA9S5CcAC6JzJZryjK5Epvtv/r9ifHBmEvr4Fe88f1jEye7/vHmfNwiM6sY9BTb59KyeNLxqkCCVKefNfwqGzl7GpGUiZQYbZhRYgxgnA6KbcYa55gQu9Lu0HbuxYgmmeqVUFDhGp6OMAxExRVQ7/jvsx4EXsuc1XAPjzTECzw5RyzrAzfuInK5dNAGVmIzzwucIBxq9y9TLiWKSh2KmVIp/54/Vh6YVD9pGrmRCWUo+pFpcS9m7J9DV4u13BkYqOWFenYmfI/2NymnyI80H50u";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -60,6 +62,22 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
+                        /** ALBERT'S MODIFIED DETECTION: DETECT WHEN ONE OBJECT V0.1 */
+                        if (updatedRecognitions.size() == 0) {
+                            telemetry.addLine("Found nothing");
+                        }
+                        if (updatedRecognitions.size() == 1) { // when detecting one object
+                            for (Recognition recognition : updatedRecognitions) { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
+                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) { // if its a gold mineral
+                                    telemetry.addLine("Gold Detected!");
+                                } else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
+                                    telemetry.addLine("Silver Detected!");
+                                }
+                            }
+                        }
+                        telemetry.update();
+                        /** END ALBERT'S WEIRD THING */
+                        /** SAMPLE TENSORFLOW: UN-COMMENT WHEN USING AGAIN *//*
                         if (updatedRecognitions.size() == 3) {
                             int goldMineralX = -1;
                             int silverMineral1X = -1;
@@ -84,6 +102,7 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode {
                             }
                         }
                         telemetry.update();
+                         */
                     }
                 }
             }

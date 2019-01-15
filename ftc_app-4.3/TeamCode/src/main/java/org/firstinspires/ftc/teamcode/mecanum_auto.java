@@ -61,6 +61,8 @@ public class mecanum_auto extends LinearOpMode {
     private DcMotor mDrv_r0 = null;
     private DcMotor mDrv_r1 = null;
 
+    DcMotor[] mDrive = new DcMotor[]{ mDrv_l0, mDrv_l1, mDrv_r0, mDrv_r1 };
+
     //DcMotor[] mDrv_l = new DcMotor[]{ mDrv_l0, mDrv_l1 };
     //DcMotor[] mDrv_r = new DcMotor[]{ mDrv_r0, mDrv_r1 };
 
@@ -79,34 +81,34 @@ public class mecanum_auto extends LinearOpMode {
     public void turnRight(double power, double holdTime)
     { // turn right for holdTime at power
         telemetry.addData("Turn Right",  "pow:%3f hold:%3f", power, holdTime);
-        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ power, -power }, holdTime); // run the motors
+        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_r1 }, new double[]{ power, -power }, holdTime); // run the motors
     };
     public void turnLeft(double power, double holdTime)
     { // turn left for holdTime at power
         telemetry.addData("Turn Left",  "pow:%3f hold:%3f", power, holdTime);
-        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ -power, power }, holdTime); // run the motors
+        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_r1 }, new double[]{ -power, power }, holdTime); // run the motors
     };
 
     // lattice shifting
     public void shift_f(double power, double holdTime)
     { // move forward for holdTime at power
         telemetry.addData("Shift Forwards",  "pow:%3f hold:%3f", power, holdTime);
-        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ power }, holdTime); // run the motors
+        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_r1 }, new double[]{ power }, holdTime); // run the motors
     };
     public void shift_b(double power, double holdTime)
     { // move backward for holdTime at power
         telemetry.addData("Shift Backwards",  "pow:%3f hold:%3f", power, holdTime);
-        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_l1 }, new double[]{ -power }, holdTime); // run the motors
+        runMotors(new DcMotor[]{ mDrv_l0, mDrv_r0, mDrv_l1, mDrv_r1 }, new double[]{ -power }, holdTime); // run the motors
     };
     public void shift_l(double power, double holdTime)
     { // shift left for holdTime at power
         telemetry.addData("Shift Left",  "pow:%3f hold:%3f", power, holdTime);
-        runMotors(new DcMotor[]{ mDrv_r0, mDrv_l0, mDrv_l1, mDrv_r0 }, new double[]{ power, -power }, holdTime); // run the motors
+        runMotors(new DcMotor[]{ mDrv_r0, mDrv_l0, mDrv_l1, mDrv_r1 }, new double[]{ power, -power }, holdTime); // run the motors
     };
     public void shift_r(double power, double holdTime)
     { // shift right for holdTime at power
         telemetry.addData("Shift Right",  "pow:%3f hold:%3f", power, holdTime);
-        runMotors(new DcMotor[]{ mDrv_r0, mDrv_l0, mDrv_l1, mDrv_r0 }, new double[]{ -power, power }, holdTime); // run the motors
+        runMotors(new DcMotor[]{ mDrv_r0, mDrv_l0, mDrv_l1, mDrv_r1 }, new double[]{ -power, power }, holdTime); // run the motors
     };
 
     // diagonal shifting
@@ -130,6 +132,24 @@ public class mecanum_auto extends LinearOpMode {
         telemetry.addData("Shift Back Right",  "pow:%3f hold:%3f", power, holdTime);
         runMotors(new DcMotor[]{ mDrv_r0, mDrv_l1 }, new double[]{ -power }, holdTime); // run the motors
     };
+
+    // control
+    public void pause(double holdTime)
+    {
+        telemetry.addData("holding for", "time: %3f", holdTime);
+        ElapsedTime holdTimer = new ElapsedTime(); // make a timer
+        holdTimer.reset(); // set to 0
+        while (opModeIsActive() && holdTimer.time() < holdTime) {} // wait for timer to end
+
+    }
+    public void stop_drive()
+    {
+        telemetry.addLine("Stopped");
+        for (int i=0; i<mDrive.length; i++)
+        {
+            mDrive[i].setPower(0);
+        }
+    }
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -145,31 +165,33 @@ public class mecanum_auto extends LinearOpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        mDrv_l0.setDirection(DcMotor.Direction.FORWARD);
-        mDrv_l1.setDirection(DcMotor.Direction.FORWARD);
-        mDrv_r0.setDirection(DcMotor.Direction.REVERSE);
-        mDrv_r1.setDirection(DcMotor.Direction.REVERSE);
+        mDrv_l0.setDirection(DcMotor.Direction.REVERSE);
+        mDrv_l1.setDirection(DcMotor.Direction.REVERSE);
+        mDrv_r0.setDirection(DcMotor.Direction.FORWARD);
+        mDrv_r1.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        shift_f(1, 1);
-        shift_b(1, 1);
-        shift_l(1, 1);
-        shift_r(1, 1);
-        shift_fl(1, 1);
-        shift_br(1, 1);
-        shift_fr(1, 1);
-        shift_bl(1, 1);
-        turnRight(1, 1);
-        turnLeft(1, 1);
+        double debug_hold = 5;
+
+        shift_f(1, debug_hold*4); pause(1);
+        shift_b(1, debug_hold); pause(1);
+        shift_l(1, debug_hold); pause(1);
+        shift_r(1, debug_hold); pause(1);
+        shift_fl(1, debug_hold); pause(1);
+        shift_br(1, debug_hold); pause(1);
+        shift_fr(1, debug_hold); pause(1);
+        shift_bl(1, debug_hold); pause(1);
+        turnRight(1, debug_hold); pause(1);
+        turnLeft(1, debug_hold); pause(1);
 
 
         // crater pseudo code:
         /*
         raise rack to lower robot
-        move slightly to unhook
+        turn left 180
         forward right diagonal to first sample
         check sample
         horizontal left to second sample
@@ -196,8 +218,9 @@ public class mecanum_auto extends LinearOpMode {
         turn right 45 degrees so that you face the wall
         move horizontal right to go into depo
         drop marker
-        move horizontal left to crater and park
-         */
+        turn right 90 deg
+        move horizontal right into crater and park
+        */
 
         // TODO: add the actual auto and also get the vars for holdtime to distance/rotation
 
