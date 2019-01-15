@@ -1,4 +1,4 @@
-//ur mom gay
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -63,19 +63,19 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode {
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
                         /** ALBERT'S MODIFIED DETECTION: DETECT WHEN ONE OBJECT V0.1 */
+                        if (updatedRecognitions.size() == 0) {
+                            telemetry.addLine("Found nothing");
+                        }
                         if (updatedRecognitions.size() == 1) { // when detecting one object
                             for (Recognition recognition : updatedRecognitions) { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) { // if its a gold mineral
                                     telemetry.addLine("Gold Detected!");
                                 } else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
                                     telemetry.addLine("Silver Detected!");
-                                } else {
-                                    telemetry.addLine("Found nothing");
                                 }
-
-                                telemetry.update();
                             }
                         }
+                        telemetry.update();
                         /** END ALBERT'S WEIRD THING */
                         /** SAMPLE TENSORFLOW: UN-COMMENT WHEN USING AGAIN *//*
                         if (updatedRecognitions.size() == 3) {
