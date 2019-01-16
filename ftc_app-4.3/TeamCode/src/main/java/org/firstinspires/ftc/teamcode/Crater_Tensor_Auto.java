@@ -18,7 +18,7 @@ import java.util.List;
 
 //@Disabled
 @Autonomous(name="Crater Unhook w/ Tensor sampling", group="Final")
-public class full_auto_base extends LinearOpMode {
+public class Crater_Tensor_Auto extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
@@ -228,13 +228,17 @@ public class full_auto_base extends LinearOpMode {
         shift_r(1, 0); // shift over until we are at the wall
         turnRight(1, 0.5*NINTEY_DEG); // turn to face the depot
         shift_f(1, 0); // drive to depot
+        state ++;
+
 
         /** 4 Drop marker */
         dropMarker(); // drop the marker
+        state ++;
 
         /** 5 Turn around and park to crater */
 
         shift_b(1, 0); // back up into crater
+        state ++;
 
 
 
