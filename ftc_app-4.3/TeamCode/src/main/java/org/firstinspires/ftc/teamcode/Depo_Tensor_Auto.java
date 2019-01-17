@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 // motor imports
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 // vuforia/tensor imports
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -23,6 +24,8 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
     private static final String VUFORIA_KEY = "AXintg3/////AAABmfNtfFit30hUjY6OwyDJ+ApUdprK4NLN3D7Fo0PdokHRKNToq2vdRLN6q9SaOptQwr7stamCCbjslhfHa4xoVwA9S5CcAC6JzJZryjK5Epvtv/r9ifHBmEvr4Fe88f1jEye7/vHmfNwiM6sY9BTb59KyeNLxqkCCVKefNfwqGzl7GpGUiZQYbZhRYgxgnA6KbcYa55gQu9Lu0HbuxYgmmeqVUFDhGp6OMAxExRVQ7/jvsx4EXsuc1XAPjzTECzw5RyzrAzfuInK5dNAGVmIzzwucIBxq9y9TLiWKSh2KmVIp/54/Vh6YVD9pGrmRCWUo+pFpcS9m7J9DV4u13BkYqOWFenYmfI/2NymnyI80H50u";
+    double ARM_UP_NINETY = 1.5;
+    double ARM_DOWN_NINETY = 0.5;
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -44,6 +47,12 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     private DcMotor mDrv_l1 = null;
     private DcMotor mDrv_r0 = null;
     private DcMotor mDrv_r1 = null;
+
+    private DcMotor mArm = null;
+    private DcMotor mWch = null;
+    private DcMotor mPin = null;
+    private Servo sBox = null;
+    private Servo sBoxFloppy = null;
 
     DcMotor[] mDrive = new DcMotor[]{ mDrv_l0, mDrv_l1, mDrv_r0, mDrv_r1 };
 
@@ -139,10 +148,107 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         }
     }
 
+    // arm stuff & and pinin
+
+
+    public void turnArm(double holdTime, double power)
+    {
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
+            mArm.setPower(power/3);
+        }
+    }
+
+    public void turnBoxServo(double holdTime, double turnAmount)
+    { // not used
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
+            //boxPosition += turnAmount; // Adds the amount you want to turn the box to the current position.
+            sBox.setPosition(turnAmount); // Sets the new position of the box
+        }
+        sBox.setPosition(0.5);
+    }
+    public void stopBoxServo()
+    {
+        sBox.setPosition(0.5);
+    }
+    public void turnFloppy(double holdTime, double turnAmount)
+    {
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
+            sBoxFloppy.setPosition(turnAmount);
+        }
+        sBoxFloppy.setPosition(0.5);
+    }
+    public void stopFloppy()
+    {
+        sBoxFloppy.setPosition(0.5);
+    }
+    /*
+    public void setBoxPosition(double position)
+    { // not used
+        while (opModeIsActive())
+        {
+            sBox.setPosition(position);
+        }
+    }*/
+
+    public void raiseRackPinionMotor(double holdTime, double power)
+    {
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime) {
+            mPin.setPower(-power);
+            mArm.setPower(.33);
+        }
+        mPin.setPower(0);
+    }
+
+    public void lowerRackPinionMotor(double holdTime, double power)
+    {
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
+            mPin.setPower(power);
+        }
+        mPin.setPower(0);
+    }
+
+    public void extendArm(double holdTime, double power)
+    { // not used
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
+            mWch.setPower(power);
+        }
+    }
+
+    public void extendRaise(double holdTime, double power)
+    {
+        ElapsedTime holdTimer = new ElapsedTime();
+        holdTimer.reset();
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
+            mArm.setPower(power/3);
+            mWch.setPower(power);
+        }
+    }
+
     // others
     public void dropMarker()
-    { // TODO: thISSSS
-
+    {
+        turnArm(ARM_UP_NINETY, -1); // turns the arm to put down the marker
+        turnBoxServo(1, 1); // turns the box to drop marker
+        turnFloppy(1, 1); // turns the floppy tube to make sure that the marker drops
+        turnArm(ARM_DOWN_NINETY, 1); // puts the arm back in the air so that the robot can be driven
     }
 
     @Override
@@ -150,6 +256,31 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        mDrv_l0 = hardwareMap.get(DcMotor.class, "mDrv_l0");
+        mDrv_l1 = hardwareMap.get(DcMotor.class, "mDrv_l1");
+        mDrv_r0 = hardwareMap.get(DcMotor.class, "mDrv_r0");
+        mDrv_r1 = hardwareMap.get(DcMotor.class, "mDrv_r1");
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+        mDrv_l0.setDirection(DcMotor.Direction.REVERSE);
+        mDrv_l1.setDirection(DcMotor.Direction.REVERSE);
+        mDrv_r0.setDirection(DcMotor.Direction.FORWARD);
+        mDrv_r1.setDirection(DcMotor.Direction.FORWARD);
+
+        mArm = hardwareMap.get(DcMotor.class, "mArm");
+        mWch = hardwareMap.get(DcMotor.class, "mWch");
+        mPin = hardwareMap.get(DcMotor.class, "mPin");
+        sBox = hardwareMap.get(Servo.class, "sBox");
+        sBoxFloppy = hardwareMap.get(Servo.class, "sBoxFloppy");
+
 
 
 
@@ -174,10 +305,9 @@ public class Depo_Tensor_Auto extends LinearOpMode {
 
         state ++;
         /** 1 Unhooking from lander and moving to sampling field */
-        // extend pinion to lower robot
+        raiseRackPinionMotor(4.5, 1); // extend rack
         turnLeft(1, NINTEY_DEG * 2); // turn around to unhook
         shift_bl(1, ONE_FOOT * 3.33); // go to first sample
-        // TODO: this
         /** 2 Sampling sequence */
         int current = 0; // robot's perspective 0 = right, 1 = middle, 2 = left (facing field corner from lander)
         // current is how many times we've checked and the mineral was silver
