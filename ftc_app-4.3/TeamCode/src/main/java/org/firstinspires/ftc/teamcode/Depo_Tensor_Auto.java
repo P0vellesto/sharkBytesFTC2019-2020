@@ -174,6 +174,9 @@ public class Depo_Tensor_Auto extends LinearOpMode {
 
         state ++;
         /** 1 Unhooking from lander and moving to sampling field */
+        // extend pinion to lower robot
+        turnLeft(1, NINTEY_DEG * 2); // turn around to unhook
+        shift_bl(1, ONE_FOOT * 3.33); // go to first sample
         // TODO: this
         /** 2 Sampling sequence */
         int current = 0; // robot's perspective 0 = right, 1 = middle, 2 = left (facing field corner from lander)
@@ -225,9 +228,9 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         }
 
         /** 3 End of sampling, move to the depot */
-        shift_r(1, 0); // shift over until we are at the wall
-        turnRight(1, 0.5*NINTEY_DEG); // turn to face the depot
-        shift_f(1, 0); // drive to depot
+        shift_r(1, ONE_FOOT * 2.08); // shift over until we are at the wall
+        turnLeft(1, 0.5*NINTEY_DEG); // back to the wall
+        shift_l(1, ONE_FOOT * 5); // drive into depot
         state ++;
 
 
@@ -236,8 +239,8 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         state ++;
 
         /** 5 Turn around and park to crater */
-
-        shift_b(1, 0); // back up into crater
+        turnRight(1,NINTEY_DEG); // face wall
+        shift_r(1, ONE_FOOT * 7.5); // go to crater and park
         state ++;
 
 
