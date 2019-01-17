@@ -174,7 +174,9 @@ public class Crater_Tensor_Auto extends LinearOpMode {
 
         state ++;
         /** 1 Unhooking from lander and moving to sampling field */
-        // TODO: this
+        // extend pinion to lower robot
+        turnLeft(1, NINTEY_DEG * 2); // turn around to unhook
+        shift_bl(1, ONE_FOOT * 3.33); // go to first sample
         /** 2 Sampling sequence */
         int current = 0; // robot's perspective 0 = right, 1 = middle, 2 = left (facing field corner from lander)
         // current is how many times we've checked and the mineral was silver
@@ -225,9 +227,9 @@ public class Crater_Tensor_Auto extends LinearOpMode {
         }
 
         /** 3 End of sampling, move to the depot */
-        shift_r(1, 0); // shift over until we are at the wall
-        turnRight(1, 0.5*NINTEY_DEG); // turn to face the depot
-        shift_f(1, 0); // drive to depot
+        shift_r(1, ONE_FOOT * 2.08); // shift over until we are at the wall
+        turnLeft(1, 0.5*NINTEY_DEG); // face back to the wall
+        shift_r(1, ONE_FOOT * 6.25); // go to depo
         state ++;
 
 
@@ -237,7 +239,7 @@ public class Crater_Tensor_Auto extends LinearOpMode {
 
         /** 5 Turn around and park to crater */
 
-        shift_b(1, 0); // back up into crater
+        shift_l(1, ONE_FOOT * 6.66); // go to crater and park
         state ++;
 
 
