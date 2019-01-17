@@ -239,7 +239,7 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         state ++;
 
         /** 5 Turn around and park to crater */
-        turnRight(1,NINTEY_DEG); // face wall
+        turnLeft(1,NINTEY_DEG); // face wall
         shift_r(1, ONE_FOOT * 7.5); // go to crater and park
         state ++;
 
