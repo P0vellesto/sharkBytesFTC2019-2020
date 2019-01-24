@@ -76,6 +76,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
     //boolean sensitivity = false; // if true, the drive train is half speed
     int sensitivityValue = 1;
     boolean sensitivitySwitch = false; // used to limit the switching of sensitivity to once per second
+    String telemetryDirection;
 
     /* Albert's functions (deprecated)
     public void powerRight(double power) { // set power to the right motors
@@ -264,6 +265,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             mDrv_l1.setPower(power);
             mDrv_r0.setPower(-power);
             mDrv_r1.setPower(-power);
+            telemetryDirection = "turningRight";
         }
         if (gamepad1.left_bumper)
         {
@@ -272,6 +274,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             mDrv_l1.setPower(-power);
             mDrv_r0.setPower(power);
             mDrv_r1.setPower(power);
+            telemetryDirection = "turningLeft";
         }
         if (!turning)
         {
@@ -357,12 +360,12 @@ public class Mecanum_TeleOp extends LinearOpMode {
         else if (dirY >= 0.5 )
         {
             notForOrBack = false;
-            direction = "forward";
+            direction = "backward";
         }
         else if (dirY <= -0.5)
         {
             notForOrBack = false;
-            direction = "backward";
+            direction = "forward";
         }
 
         // if it's to the left
@@ -397,7 +400,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "right-backward";
             }
         }
-
+        telemetryDirection = direction;
         return direction;
     }
 
@@ -491,14 +494,15 @@ public class Mecanum_TeleOp extends LinearOpMode {
             //telemetry.addData("Drive", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.addData("Rack and Pinion", "(%.2f)", pinPower);
             telemetry.addData("arm", "Arm (%.2f), Winch (%.2f), Box (%.2f)", armPower, wchPower, boxPower);
-            if (aPressed)
+            telemetry.addData("Power", "Joystick (%.2f)", power);
+            /*if (aPressed)
             {
                 telemetry.addLine("A is pressed");
             }
             else
             {
                 telemetry.addLine("A is not pressed");
-            }
+            }*/
             if (sensitivityValue == 1)
             {
                 telemetry.addLine("100% Power");
@@ -511,6 +515,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             {
                 telemetry.addLine("25% Power");
             }
+            telemetry.addLine("Direction: " + telemetryDirection);
             telemetry.update();
         }
     }
