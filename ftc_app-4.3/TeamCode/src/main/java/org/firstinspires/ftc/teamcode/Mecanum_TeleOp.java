@@ -463,7 +463,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
 
             dirX = gamepad1.left_stick_x;
             dirY = gamepad1.left_stick_y;
-            power = gamepad1.right_stick_y;
+            power = gamepad1.right_stick_y / sensitivityValue;
             if (power < 0)
             {
                 power = -power;
