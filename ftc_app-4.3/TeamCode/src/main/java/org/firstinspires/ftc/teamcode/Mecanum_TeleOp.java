@@ -277,58 +277,58 @@ public class Mecanum_TeleOp extends LinearOpMode {
             String direction = evaluateDirection(dirX, dirY);
             if (direction == "forward")
             {
-                mDrv_l0.setPower(power / sensitivityValue);
-                mDrv_l1.setPower(power / sensitivityValue);
-                mDrv_r0.setPower(power / sensitivityValue);
-                mDrv_r1.setPower(power / sensitivityValue);
+                mDrv_l0.setPower(power);
+                mDrv_l1.setPower(power);
+                mDrv_r0.setPower(power);
+                mDrv_r1.setPower(power);
             }
             else if (direction == "backward")
             {
-                mDrv_l0.setPower(-power / sensitivityValue);
-                mDrv_l1.setPower(-power / sensitivityValue);
-                mDrv_r0.setPower(-power / sensitivityValue);
-                mDrv_r1.setPower(-power / sensitivityValue);
+                mDrv_l0.setPower(-power);
+                mDrv_l1.setPower(-power);
+                mDrv_r0.setPower(-power);
+                mDrv_r1.setPower(-power);
             }
             else if (direction == "left")
             {
-                mDrv_l0.setPower(-power / sensitivityValue);
-                mDrv_l1.setPower(power / sensitivityValue);
-                mDrv_r0.setPower(power / sensitivityValue);
-                mDrv_r1.setPower(-power / sensitivityValue);
+                mDrv_l0.setPower(-power);
+                mDrv_l1.setPower(power);
+                mDrv_r0.setPower(power);
+                mDrv_r1.setPower(-power);
             }
             else if (direction == "right")
             {
-                mDrv_l0.setPower(power / sensitivityValue);
-                mDrv_l1.setPower(-power / sensitivityValue);
-                mDrv_r0.setPower(-power / sensitivityValue);
-                mDrv_r1.setPower(power / sensitivityValue);
+                mDrv_l0.setPower(power);
+                mDrv_l1.setPower(-power);
+                mDrv_r0.setPower(-power);
+                mDrv_r1.setPower(power);
             }
             else if (direction == "left-forward")
             {
                 mDrv_l0.setPower(0);
-                mDrv_l1.setPower(power / sensitivityValue);
-                mDrv_r0.setPower(power / sensitivityValue);
+                mDrv_l1.setPower(power);
+                mDrv_r0.setPower(power);
                 mDrv_r1.setPower(0);
             }
             else if (direction == "left-backward")
             {
-                mDrv_l0.setPower(-power / sensitivityValue);
+                mDrv_l0.setPower(-power);
                 mDrv_l1.setPower(0);
                 mDrv_r0.setPower(0);
-                mDrv_r1.setPower(-power / sensitivityValue);
+                mDrv_r1.setPower(-power);
             }
             else if (direction == "right-forward")
             {
-                mDrv_l0.setPower(power / sensitivityValue);
-                mDrv_r1.setPower(power / sensitivityValue);
+                mDrv_l0.setPower(power);
+                mDrv_r1.setPower(power);
                 mDrv_l1.setPower(0);
                 mDrv_r0.setPower(0);
             }
             else if (direction == "right-backward")
             {
                 mDrv_l0.setPower(0);
-                mDrv_l1.setPower(-power / sensitivityValue);
-                mDrv_r0.setPower(-power / sensitivityValue);
+                mDrv_l1.setPower(-power);
+                mDrv_r0.setPower(-power);
                 mDrv_r1.setPower(0);
             }
             else if (direction == "unknown")
@@ -468,7 +468,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
 
             dirX = gamepad1.left_stick_x;
             dirY = gamepad1.left_stick_y;
-            power = gamepad1.right_stick_y;
+            power = gamepad1.right_stick_y / sensitivityValue;
             if (power < 0)
             {
                 power = -power;
