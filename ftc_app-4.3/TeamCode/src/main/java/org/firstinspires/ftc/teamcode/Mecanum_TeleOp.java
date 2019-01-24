@@ -326,12 +326,26 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 mDrv_r0.setPower(-power);
                 mDrv_r1.setPower(0);
             }
+            else
+            {
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(0);
+                mDrv_r0.setPower(0);
+                mDrv_r1.setPower(0);
+            }
+        }
+        if (power == 0)
+        {
+            mDrv_l0.setPower(0);
+            mDrv_l1.setPower(0);
+            mDrv_r0.setPower(0);
+            mDrv_r1.setPower(0);
         }
     }
     // is used for MecPowerEasy
     public String evaluateDirection(double dirX, double dirY)
     {
-        String direction = "uknown";
+        String direction = "unknown";
         boolean notForOrBack = true;
         boolean directionSet = false;
 
@@ -447,9 +461,9 @@ public class Mecanum_TeleOp extends LinearOpMode {
             rightX = gamepad1.right_stick_x;
             leftX = gamepad1.left_stick_x;
 
-            dirX = gamepad1.right_stick_x;
-            dirY = gamepad1.right_stick_y;
-            power = gamepad1.left_stick_y;
+            dirX = gamepad1.left_stick_x;
+            dirY = gamepad1.left_stick_y;
+            power = gamepad1.right_stick_y;
             if (power < 0)
             {
                 power = -power;
@@ -493,7 +507,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             {
                 telemetry.addLine("50% Power");
             }
-            else if (sensitivityValue == 3)
+            else if (sensitivityValue == 4)
             {
                 telemetry.addLine("25% Power");
             }
