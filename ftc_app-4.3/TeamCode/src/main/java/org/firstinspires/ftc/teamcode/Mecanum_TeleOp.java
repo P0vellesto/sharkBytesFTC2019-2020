@@ -373,7 +373,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             notForOrBack = false;
             direction = "backward";
         }
-        if (dirX <= -0.5)
+        if (dirX <= -0.33)
         {
             if (notForOrBack)
             {
@@ -388,7 +388,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "left-backward";
             }
         }
-        if (dirX >= 0.5)
+        if (dirX >= 0.33)
         {
             if (notForOrBack)
             {
