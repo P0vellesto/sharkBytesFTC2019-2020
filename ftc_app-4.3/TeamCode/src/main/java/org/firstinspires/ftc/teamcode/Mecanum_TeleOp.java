@@ -76,6 +76,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
     boolean sensitivity = false; // if true, the drive train is half speed
     int sensitivityValue = 1;
     boolean sensitivitySwitch = false; // used to limit the switching of sensitivity to once per second
+    String telementryDirection;
 
     /* Albert's functions (deprecated)
     public void powerRight(double power) { // set power to the right motors
@@ -388,7 +389,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "left-backward";
             }
         }
-        if (dirX >= 0.33)
+        else if (dirX >= 0.33)
         {
             if (notForOrBack)
             {
@@ -403,6 +404,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "right-backward";
             }
         }
+        telementryDirection = direction;
         return direction;
     }
 
@@ -496,14 +498,15 @@ public class Mecanum_TeleOp extends LinearOpMode {
             //telemetry.addData("Drive", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.addData("Rack and Pinion", "(%.2f)", pinPower);
             telemetry.addData("arm", "Arm (%.2f), Winch (%.2f), Box (%.2f)", armPower, wchPower, boxPower);
-            if (aPressed)
+            telemetry.addData("power", "JoystickPower (%.2f)", power);
+            /*if (aPressed)
             {
                 telemetry.addLine("A is pressed");
             }
             else
             {
                 telemetry.addLine("A is not pressed");
-            }
+            }*/
             if (sensitivityValue == 1)
             {
                 telemetry.addLine("100% Power");
@@ -516,6 +519,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             {
                 telemetry.addLine("25% Power");
             }
+            telemetry.addLine("Direction is " + telementryDirection);
             telemetry.update();
         }
     }
