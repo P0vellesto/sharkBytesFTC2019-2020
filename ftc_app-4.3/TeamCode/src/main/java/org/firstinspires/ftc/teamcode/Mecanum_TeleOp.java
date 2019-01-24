@@ -275,51 +275,88 @@ public class Mecanum_TeleOp extends LinearOpMode {
         if (!turning)
         {
             String direction = evaluateDirection(dirX, dirY);
-            if (direction == "forward" || direction == "backward")
+            if (direction == "forward")
             {
                 mDrv_l0.setPower(power);
                 mDrv_l1.setPower(power);
                 mDrv_r0.setPower(power);
                 mDrv_r1.setPower(power);
             }
-            if (direction == "left")
+            else if (direction == "backward")
+            {
+                mDrv_l0.setPower(-power);
+                mDrv_l1.setPower(-power);
+                mDrv_r0.setPower(-power);
+                mDrv_r1.setPower(-power);
+            }
+            else if (direction == "left")
             {
                 mDrv_l0.setPower(-power);
                 mDrv_l1.setPower(power);
                 mDrv_r0.setPower(power);
                 mDrv_r1.setPower(-power);
             }
-            if (direction == "right")
+            else if (direction == "right")
             {
                 mDrv_l0.setPower(power);
                 mDrv_l1.setPower(-power);
                 mDrv_r0.setPower(-power);
                 mDrv_r1.setPower(power);
             }
-            if (direction == "left-forward")
+            else if (direction == "left-forward")
             {
-
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(power);
+                mDrv_r0.setPower(power);
+                mDrv_r1.setPower(0);
             }
-            if (direction == "left-backward")
+            else if (direction == "left-backward")
             {
-
+                mDrv_l0.setPower(-power);
+                mDrv_l1.setPower(0);
+                mDrv_r0.setPower(0);
+                mDrv_r1.setPower(-power);
             }
-            if (direction == "right-forward")
+            else if (direction == "right-forward")
             {
                 mDrv_l0.setPower(power);
                 mDrv_r1.setPower(power);
                 mDrv_l1.setPower(0);
                 mDrv_r0.setPower(0);
             }
-            if (direction == "right-backward")
+            else if (direction == "right-backward")
             {
-
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(-power);
+                mDrv_r0.setPower(-power);
+                mDrv_r1.setPower(0);
             }
+            else if (direction == "unknown")
+            {
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(0);
+                mDrv_r0.setPower(0);
+                mDrv_r1.setPower(0);
+            }
+            else
+            {
+                mDrv_l0.setPower(0);
+                mDrv_l1.setPower(0);
+                mDrv_r0.setPower(0);
+                mDrv_r1.setPower(0);
+            }
+        }
+        if (power == 0)
+        {
+            mDrv_l0.setPower(0);
+            mDrv_l1.setPower(0);
+            mDrv_r0.setPower(0);
+            mDrv_r1.setPower(0);
         }
     }
     public String evaluateDirection(double dirX, double dirY)
     {
-        String direction = "uknown";
+        String direction = "unknown";
         boolean notForOrBack = true;
         boolean directionSet = false;
         if (dirY <= 0.5 && dirY >= -0.5)
@@ -429,9 +466,13 @@ public class Mecanum_TeleOp extends LinearOpMode {
             rightX = gamepad1.right_stick_x;
             leftX = gamepad1.left_stick_x;
 
-            dirX = gamepad1.right_stick_x;
-            dirY = gamepad1.right_stick_y;
-            power = gamepad1.left_stick_y;
+            dirX = gamepad1.left_stick_x;
+            dirY = gamepad1.left_stick_y;
+            power = gamepad1.right_stick_y;
+            if (power < 0)
+            {
+                power = -power;
+            }
 
             pinPower = gamepad2.left_stick_y;
             boxPower = gamepad2.left_stick_x;
@@ -471,7 +512,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             {
                 telemetry.addLine("50% Power");
             }
-            else if (sensitivityValue == 3)
+            else if (sensitivityValue == 4)
             {
                 telemetry.addLine("25% Power");
             }
