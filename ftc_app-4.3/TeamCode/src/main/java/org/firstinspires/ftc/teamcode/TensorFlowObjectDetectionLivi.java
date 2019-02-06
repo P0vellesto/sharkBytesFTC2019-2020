@@ -42,6 +42,7 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode {
             initTfod();
         } else {
             telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+            telemetry.update();
         }
 
         /** Wait for the game to begin */

@@ -9,30 +9,36 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
-@TeleOp(name="run_servo_port_0")
-@Disabled
+@TeleOp(name="SERVO TEST")
+
 public class servo_test extends LinearOpMode{
-    private Servo sPin = null; // servo on port zero
+    private Servo servo = null; // servo on port zero
 
     @Override
     public void runOpMode() {
 
-        sPin = hardwareMap.get(Servo.class, "sPin"); // get the port thingy
+        servo = hardwareMap.get(Servo.class, "servo"); // get the port thingy
 
         waitForStart();
 
         while (opModeIsActive())
         {
-            float direction = (-gamepad1.right_stick_y) * 10f; // 10f to say that its a float cuz java syntax is weird
-            if (direction > 1)
+            float thresh = 0.1f;
+            float direction = (-gamepad1.right_stick_y); // 10f to say that its a float cuz java syntax is weird
+            //servo.setPosition(direction);
+            if (direction > thresh)
             {
-                sPin.setPosition(direction);
+                servo.setPosition(direction);
             }
-            if (direction < -1)
+            else if (direction < -thresh)
             {
-                sPin.setPosition(direction);
+                servo.setPosition(direction);
             }
-            telemetry.addData("arm",  "Offset = %.2f", direction);
+            else
+            {
+                servo.setPosition(0.5);
+            }
+            telemetry.addData("servo",  "power = %.2f", direction);
             telemetry.update();
         }
     }

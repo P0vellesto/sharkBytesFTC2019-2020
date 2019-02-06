@@ -19,7 +19,8 @@ import java.util.List;
 
 //@Disabled
 @Autonomous(name="Depo Unhook w/ Tensor sampling", group="Final")
-public class Depo_Tensor_Auto extends LinearOpMode {
+public class Depo_Tensor_Auto extends LinearOpMode
+{
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
@@ -52,7 +53,7 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     private DcMotor mWch = null;
     private DcMotor mPin = null;
     private Servo sBox = null;
-    private Servo sBoxFloppy = null;
+    //private Servo sBoxFloppy = null;
 
     DcMotor[] mDrive = new DcMotor[]{ mDrv_l0, mDrv_l1, mDrv_r0, mDrv_r1 };
 
@@ -131,8 +132,8 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     // control
     public void pause(double holdTime)
     {
-        telemetry.addData("holding for", "time: %3f", holdTime);
-        telemetry.update();
+        /*telemetry.addData("holding for", "time: %3f", holdTime);
+        telemetry.update();*/
         ElapsedTime holdTimer = new ElapsedTime(); // make a timer
         holdTimer.reset(); // set to 0
         while (opModeIsActive() && holdTimer.time() < holdTime) {} // wait for timer to end
@@ -176,7 +177,7 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     {
         sBox.setPosition(0.5);
     }
-    public void turnFloppy(double holdTime, double turnAmount)
+    /*public void turnFloppy(double holdTime, double turnAmount)
     {
         ElapsedTime holdTimer = new ElapsedTime();
         holdTimer.reset();
@@ -189,18 +190,19 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     public void stopFloppy()
     {
         sBoxFloppy.setPosition(0.5);
-    }
-    /*
+    }*/
+
     public void setBoxPosition(double position)
     { // not used
         while (opModeIsActive())
         {
             sBox.setPosition(position);
         }
-    }*/
+    }
 
     public void raiseRackPinionMotor(double holdTime, double power)
     {
+        telemetry.addLine("Rack and pinion is being extended for " + holdTime + "seconds.");
         ElapsedTime holdTimer = new ElapsedTime();
         holdTimer.reset();
         while (opModeIsActive() && holdTimer.time() < holdTime) {
@@ -212,6 +214,7 @@ public class Depo_Tensor_Auto extends LinearOpMode {
 
     public void lowerRackPinionMotor(double holdTime, double power)
     {
+        telemetry.addLine("Rack and pinion is being unextended for " + holdTime + "seconds.");
         ElapsedTime holdTimer = new ElapsedTime();
         holdTimer.reset();
         while (opModeIsActive() && holdTimer.time() < holdTime)
@@ -245,9 +248,10 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     // others
     public void dropMarker()
     {
+        telemetry.addLine("Marker is being dropped.");
         turnArm(ARM_UP_NINETY, -1); // turns the arm to put down the marker
         turnBoxServo(1, 1); // turns the box to drop marker
-        turnFloppy(1, 1); // turns the floppy tube to make sure that the marker drops
+        //turnFloppy(1, 1); // turns the floppy tube to make sure that the marker drops
         turnArm(ARM_DOWN_NINETY, 1); // puts the arm back in the air so that the robot can be driven
     }
 
@@ -256,6 +260,15 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector())
+        {
+            initTfod();
+        }
+        else
+        {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -279,7 +292,7 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         mWch = hardwareMap.get(DcMotor.class, "mWch");
         mPin = hardwareMap.get(DcMotor.class, "mPin");
         sBox = hardwareMap.get(Servo.class, "sBox");
-        sBoxFloppy = hardwareMap.get(Servo.class, "sBoxFloppy");
+        //sBoxFloppy = hardwareMap.get(Servo.class, "sBoxFloppy");
 
 
 
@@ -313,47 +326,82 @@ public class Depo_Tensor_Auto extends LinearOpMode {
         // current is how many times we've checked and the mineral was silver
         // when current is negative, then we have correctly sampled already and dont need to use the camera anymore
 
-        if (tfod != null) {
+        if (tfod != null)
+        {
             tfod.activate();
         }
 
-        while (state == 2) {
-            if (tfod != null) {
+        while (state == 2)
+        {
+            telemetry.addLine("Mineral sampling commencing");
+            telemetry.update();
+            if (tfod != null)
+            {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
+                if (updatedRecognitions != null)
+                {
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
                     /** ALBERT'S MODIFIED DETECTION: DETECT WHEN ONE OBJECT V0.1 */
-                    if (updatedRecognitions.size() == 0) {
+                    if (updatedRecognitions.size() == 0)
+                    {
                         telemetry.addLine("Found nothing");
                     }
-                    if (updatedRecognitions.size() == 1) { // when detecting one object
-                        for (Recognition recognition : updatedRecognitions) { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) { // if its a gold mineral
+                    if (updatedRecognitions.size() == 1)
+                    { // when detecting one object
+                        for (Recognition recognition : updatedRecognitions) // TODO: SHOULDN'T THERE BE ONLY ONE RECOGNITION, shouldn't the recognition be updated every time???
+                        { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                            { // if its a gold mineral
                                 telemetry.addLine("Gold Detected!");
-                                // TODO: code for pushing the mineral over
-                                for (int i=0; i < 2-current; i++) { // depending on how many we passed before sucessful sapmling,
+                                telemetry.update();
+                                pause(0.5);
+                                shift_b(1, 0.25); // hit the gold cube
+                                shift_f(1, 0.25); // realign
+                                for (int i=0; i < 2-current; i++)
+                                { // depending on how many we passed before sucessful sapmling,
                                     shift_r(1, ONE_FOOT);
                                     // TODO: move left one foot
                                 }
                                 state ++;
-                            } else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
+                            }
+                            else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL))
+                            {
                                 telemetry.addLine("Silver Detected!");
+                                telemetry.update();
                                 current ++;
+                                pause(0.5);
                                 shift_r(1, ONE_FOOT);
                             }
                         }
+                    }
+                    else
+                    {
+                        telemetry.addLine("More than one object found");
+                        telemetry.update();
                     }
                     telemetry.update();
                     /** END ALBERT'S WEIRD THING */
 
                     // If needed, plug in the triple tensorflow here.
                 }
+                else
+                {
+                    telemetry.addLine("No objects detected");
+                    telemetry.update();
+                }
+            }
+            else
+            {
+                telemetry.addLine("tfod was not activated...");
+                telemetry.update();
+                break;
             }
         }
 
-        if (tfod != null) {
+        if (tfod != null)
+        {
             tfod.shutdown();
         }
 
@@ -380,7 +428,8 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     /**
      * Initialize the Vuforia localization engine.
      */
-    private void initVuforia() {
+    private void initVuforia()
+    {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
@@ -398,7 +447,8 @@ public class Depo_Tensor_Auto extends LinearOpMode {
     /**
      * Initialize the Tensor Flow Object Detection engine.
      */
-    private void initTfod() {
+    private void initTfod()
+    {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);

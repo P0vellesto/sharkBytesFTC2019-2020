@@ -70,13 +70,15 @@ public class Mecanum_TeleOp extends LinearOpMode {
     private DcMotor mArm = null; // arm base servo
     private DcMotor mWch = null; // arm extending motor
     private Servo sBox = null; // servo that turns the box on the arm
-    private Servo sBoxWheel = null; // servo that turns the wheel in the box
+    private Servo sFlp = null; // servo that turns the ziplocks in the box
 
-    boolean aPressed = false;
-    boolean sensitivity = false; // if true, the drive train is half speed
-    int sensitivityValue = 1;
+    boolean aPressed = false; // stops the box servo
+    //boolean sensitivity = false; // if true, the drive train is half speed
+    int sensitivityValue = 1; // is used to go through power settings
     boolean sensitivitySwitch = false; // used to limit the switching of sensitivity to once per second
-    String telementryDirection;
+    String telementryDirection; // used to display the direction in the telemetry
+    boolean joystick = false; // used to toggle between using and not using the joystick for power
+    boolean driveMode = true; // used to toggle between using mec easy drive and tank drive
 
     /* Albert's functions (deprecated)
     public void powerRight(double power) { // set power to the right motors
@@ -89,7 +91,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
         mDrv_l1.setPower(power);
     }
 */
-    public void mecDrive(double leftJoystickY, double rightJoystickY, double leftJoystickX, double rightJoystickX)
+    protected void mecDrive(double leftJoystickY, double rightJoystickY, double leftJoystickX, double rightJoystickX)
     {
         // if statement for going forward or backward
         if ((leftJoystickY >= 0.5 && rightJoystickY >= 0.5) || (leftJoystickY <= -0.5 && rightJoystickY <= -0.5))
@@ -140,7 +142,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             mDrv_r0.setPower(leftJoystickY / sensitivityValue);
         }
     }
-    public void doNotChangeSensitivity(double holdTime)
+    protected void doNotChangeSensitivity(double holdTime)
     {
         ElapsedTime holdTimer = new ElapsedTime();
         while (opModeIsActive() && holdTimer.time() < holdTime)
@@ -149,112 +151,93 @@ public class Mecanum_TeleOp extends LinearOpMode {
         }
         sensitivitySwitch = false;
     }
-    public void armPower(double pinionPower, double boxPower, double armPower, double wchPower)
+    protected void armPower(double pinionPower, double boxPower, double armPower, double wchPower)
     {
-        //robot.leftDrive.setPower(leftPower);
-        //robot.rightDrive.setPower(rightPower);
-
-
-        //This int check is declared and is used the check whether the box is manually turned or not. If it is manually turned, it = 1.
-        //Otherwise, it = 0.
         boolean check = false;
-        /*if (sensitivityValue == 1)
-        {
-            mDrv_r0.setPower(rightPower);
-            mDrv_r1.setPower(rightPower);
-            mDrv_l0.setPower(leftPower);
-            mDrv_l1.setPower(leftPower);
-        }
-        else if (sensitivityValue == 2)
-        {
-            mDrv_r0.setPower(rightPower / 2);
-            mDrv_r1.setPower(rightPower / 2);
-            mDrv_l0.setPower(leftPower / 2);
-            mDrv_l1.setPower(leftPower / 2);
-        }
-        else if (sensitivityValue == 3)
-        {
-            mDrv_r0.setPower(rightPower / 4);
-            mDrv_r1.setPower(rightPower / 4);
-            mDrv_l0.setPower(leftPower / 4);
-            mDrv_l1.setPower(leftPower / 4);
-        }*/
         mPin.setPower(pinionPower);
         mWch.setPower(wchPower);
         //I dunno if this works. sBox.getPowerFloat(); is something you can do, but i dunno how to work that.
         aPressed = false;
-        if (gamepad2.a)
+
+        if (sBox != null)
         {
-            aPressed = true;
-            double currentLocation = sBox.getPosition();
-            sBox.setPosition(currentLocation);
+            if (gamepad2.a)
+            {
+                aPressed = true;
+                double currentLocation = sBox.getPosition();
+                sBox.setPosition(currentLocation);
+            }
+            else if (boxPower > 0.25)
+            {
+                sBox.setPosition(boxPower);
+                check = true;
+            }
+            else if (boxPower < -0.25)
+            {
+                sBox.setPosition(boxPower);
+                check = true;
+            }
         }
-        else if (boxPower > 0.25)
+
+        if (sFlp != null)
         {
-            sBox.setPosition(boxPower);
-            check = true;
+            if (gamepad2.left_bumper)
+            {
+                sFlp.setPosition(-1);
+            }
+            else if (gamepad2.right_bumper)
+            {
+                sFlp.setPosition(1);
+            }
+            else
+            {
+                sFlp.setPosition(0.515);
+            }
         }
-        else if (boxPower < -0.25)
-        {
-            sBox.setPosition(boxPower);
-            check = true;
-        }
-        else
-        {
-            sBox.setPosition(0);
-        }
+
+        // idk why this is in the arm method, should be in mec power easy and tank drive
         if (gamepad1.a)
         {
             double holdTime = 0.25;
-            if (!sensitivitySwitch)
-            {
-                switch (sensitivityValue)
-                {
-                    case 1: sensitivityValue++; doNotChangeSensitivity(holdTime); break;
-                    case 2: sensitivityValue += 2; doNotChangeSensitivity(holdTime); break;
-                    case 4: sensitivityValue = 1; doNotChangeSensitivity(holdTime); break;
-                }
-                /*if (!(sensitivityValue == ))
-                {
-                    sensitivityValue++;
-                    ElapsedTime holdTimer = new ElapsedTime();
-                    while (opModeIsActive() && holdTimer.time() < holdTime)
-                    {
-                        sensitivitySwitch = true;
-                    }
-                    sensitivitySwitch = false;
-                }
-                else if(sensitivityValue == 3)
-                {
-                    sensitivityValue = 1;
-                    ElapsedTime holdTimer = new ElapsedTime();
-                    while (opModeIsActive() && holdTimer.time() < holdTime)
-                    {
-                        sensitivitySwitch = true;
-                    }
-                    sensitivitySwitch = false;
-                }*/
-            }
+            sensitivityValue = 2;
+            doNotChangeSensitivity(holdTime);
         }
+        else if (gamepad1.b)
+        {
+            double holdTime = 0.25;
+            sensitivityValue = 10; doNotChangeSensitivity(holdTime);
+        }
+        else if (gamepad1.x)
+        {
+            double holdTime = 0.25;
+            sensitivityValue = 1; doNotChangeSensitivity(holdTime);
+        }
+        else if (gamepad1.y)
+        {
+            joystick = !joystick;
+        }
+
         if (armPower > 0.1)
         {
             mArm.setPower(armPower);
             if (!check)
             {
-                sBox.setPosition(-armPower);
+                if (sBox != null)
+                {
+                    sBox.setPosition(-armPower);
+                }
             }
         }
         else if (armPower < -0.1)
         {
             mArm.setPower(armPower);
-            // TODO: these arm setpowers are commented out because they are being replaced by a thing in the main loop that just makes the thing go up if the joystick is up else down
-            if (!check)
+            if (sBox != null)
             {
                 sBox.setPosition(-armPower);
             }
         }
     }
-    public void mecPowerEasy(double dirX, double dirY, double power)
+    protected void mecPowerEasy(double dirX, double dirY, double power)
     {
         boolean turning = false;
         if (gamepad1.right_bumper)
@@ -264,6 +247,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             mDrv_l1.setPower(power / sensitivityValue);
             mDrv_r0.setPower(-power / sensitivityValue);
             mDrv_r1.setPower(-power / sensitivityValue);
+            telementryDirection = "turningRight";
         }
         if (gamepad1.left_bumper)
         {
@@ -272,64 +256,65 @@ public class Mecanum_TeleOp extends LinearOpMode {
             mDrv_l1.setPower(-power / sensitivityValue);
             mDrv_r0.setPower(power / sensitivityValue);
             mDrv_r1.setPower(power / sensitivityValue);
+            telementryDirection = "turningLeft";
         }
         if (!turning)
         {
             String direction = evaluateDirection(dirX, dirY);
             if (direction == "forward")
             {
-                mDrv_l0.setPower(power);
-                mDrv_l1.setPower(power);
-                mDrv_r0.setPower(power);
-                mDrv_r1.setPower(power);
+                mDrv_l0.setPower(power / sensitivityValue);
+                mDrv_l1.setPower(power / sensitivityValue);
+                mDrv_r0.setPower(power / sensitivityValue);
+                mDrv_r1.setPower(power / sensitivityValue);
             }
             else if (direction == "backward")
             {
-                mDrv_l0.setPower(-power);
-                mDrv_l1.setPower(-power);
-                mDrv_r0.setPower(-power);
-                mDrv_r1.setPower(-power);
+                mDrv_l0.setPower(-power / sensitivityValue);
+                mDrv_l1.setPower(-power / sensitivityValue);
+                mDrv_r0.setPower(-power / sensitivityValue);
+                mDrv_r1.setPower(-power / sensitivityValue);
             }
             else if (direction == "left")
             {
-                mDrv_l0.setPower(-power);
-                mDrv_l1.setPower(power);
-                mDrv_r0.setPower(power);
-                mDrv_r1.setPower(-power);
+                mDrv_l0.setPower(-power / sensitivityValue);
+                mDrv_l1.setPower(power / sensitivityValue);
+                mDrv_r0.setPower(power / sensitivityValue);
+                mDrv_r1.setPower(-power / sensitivityValue);
             }
             else if (direction == "right")
             {
-                mDrv_l0.setPower(power);
-                mDrv_l1.setPower(-power);
-                mDrv_r0.setPower(-power);
-                mDrv_r1.setPower(power);
+                mDrv_l0.setPower(power / sensitivityValue);
+                mDrv_l1.setPower(-power / sensitivityValue);
+                mDrv_r0.setPower(-power / sensitivityValue);
+                mDrv_r1.setPower(power / sensitivityValue);
             }
             else if (direction == "left-forward")
             {
                 mDrv_l0.setPower(0);
-                mDrv_l1.setPower(power);
-                mDrv_r0.setPower(power);
+                mDrv_l1.setPower(power / sensitivityValue);
+                mDrv_r0.setPower(power / sensitivityValue);
                 mDrv_r1.setPower(0);
             }
             else if (direction == "left-backward")
             {
-                mDrv_l0.setPower(-power);
+                mDrv_l0.setPower(-power / sensitivityValue);
                 mDrv_l1.setPower(0);
                 mDrv_r0.setPower(0);
-                mDrv_r1.setPower(-power);
+                mDrv_r1.setPower(-power / sensitivityValue);
             }
             else if (direction == "right-forward")
             {
-                mDrv_l0.setPower(power);
-                mDrv_r1.setPower(power);
+                mDrv_l0.setPower(power / sensitivityValue);
+                mDrv_r1.setPower(power / sensitivityValue);
                 mDrv_l1.setPower(0);
                 mDrv_r0.setPower(0);
             }
             else if (direction == "right-backward")
             {
                 mDrv_l0.setPower(0);
-                mDrv_l1.setPower(-power);
-                mDrv_r0.setPower(-power);
+                mDrv_l1.setPower(-power / sensitivityValue);
+                mDrv_r0.setPower(-power / sensitivityValue);
                 mDrv_r1.setPower(0);
             }
             else if (direction == "unknown")
@@ -355,11 +340,18 @@ public class Mecanum_TeleOp extends LinearOpMode {
             mDrv_r1.setPower(0);
         }
     }
-    public String evaluateDirection(double dirX, double dirY)
+    protected void tankDrive(double joystickOneY, double joystickTwoY)
+    {
+        mDrv_l0.setPower(joystickOneY / sensitivityValue);
+        mDrv_l1.setPower(joystickOneY / sensitivityValue);
+        mDrv_r0.setPower(joystickTwoY / sensitivityValue);
+        mDrv_r1.setPower(joystickTwoY / sensitivityValue);
+    }
+    protected String evaluateDirection(double dirX, double dirY)
     {
         String direction = "unknown";
+        double threshold = 0.25;
         boolean notForOrBack = true;
-        boolean directionSet = false;
         if (dirY <= 0.5 && dirY >= -0.5)
         {
             notForOrBack = true;
@@ -374,7 +366,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             notForOrBack = false;
             direction = "forward";
         }
-        if (dirX <= -0.33)
+        if (dirX <= -threshold)
         {
             if (notForOrBack)
             {
@@ -389,7 +381,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
                 direction = "left-backward";
             }
         }
-        else if (dirX >= 0.33)
+        else if (dirX >= threshold)
         {
             if (notForOrBack)
             {
@@ -409,7 +401,8 @@ public class Mecanum_TeleOp extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode() {
+    public void runOpMode()
+    {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -426,7 +419,14 @@ public class Mecanum_TeleOp extends LinearOpMode {
         // arm motors and servos
         mArm = hardwareMap.get(DcMotor.class, "mArm"); // arm base motor
         mWch = hardwareMap.get(DcMotor.class, "mWch"); // arm extending motor
-        sBox = hardwareMap.get(Servo.class, "sBox"); // box that holds commodities
+        if (hardwareMap.get(Servo.class, "sBox") != null)
+        {
+            sBox = hardwareMap.get(Servo.class, "sBox"); // box that holds commodities
+        }
+        if (hardwareMap.get(Servo.class, "sBoxFloppy") != null)
+        {
+            sFlp = hardwareMap.get(Servo.class, "sBoxFloppy"); // servo that spins the floppy tubes in the box
+        }
 
         mDrv_l0.setDirection(DcMotor.Direction.FORWARD);
         mDrv_l1.setDirection(DcMotor.Direction.FORWARD);
@@ -445,7 +445,8 @@ public class Mecanum_TeleOp extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        while (opModeIsActive())
+        {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             // these lines should be reversed because we always have right above left but sike its not so sux2sux
@@ -459,7 +460,10 @@ public class Mecanum_TeleOp extends LinearOpMode {
             double power; // used to control how much power
 
             double pinPower; // power for the pinion motor
+
             double boxPower; // for the box servo
+            double flpPower; // for the floppy tube intake
+
             double armPower; // for the servo at the base of the arm
             double wchPower; //for the motor that extends the arm
 
@@ -470,17 +474,25 @@ public class Mecanum_TeleOp extends LinearOpMode {
 
             dirX = gamepad1.left_stick_x;
             dirY = gamepad1.left_stick_y;
-            power = gamepad1.right_stick_y / sensitivityValue;
-            if (power < 0)
+            if (joystick)
             {
-                power = -power;
+                power = gamepad1.right_stick_y;
+                if (power < 0)
+                {
+                    power = -power;
+                }
+            }
+            else
+            {
+                power = 1;
             }
 
-            pinPower = gamepad2.left_stick_y;
+            pinPower = -gamepad2.left_stick_y;
+
             boxPower = gamepad2.left_stick_x;
 
             wchPower = -gamepad2.right_stick_x;
-            armPower = -gamepad2.right_stick_y/2;
+            armPower = -gamepad2.right_stick_y/4;
 
 
             // Send calculated power to wheels
@@ -490,7 +502,23 @@ public class Mecanum_TeleOp extends LinearOpMode {
             */
             // nicassa's function -- this sets power to the motors
             armPower(pinPower, boxPower, armPower, wchPower); // used to control arm
-            mecPowerEasy(dirX, dirY, power); // used to control drive train
+            if (driveMode)
+            {
+                mecPowerEasy(dirX, dirY, power); // used to control drive train
+            }
+            else
+            {
+                tankDrive(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
+            }
+
+            if (gamepad1.dpad_up)
+            {
+                driveMode = false;
+            }
+            else if (gamepad1.dpad_down)
+            {
+                driveMode = true;
+            }
 
             // Show the elapsed game time and wheel power.
             // telemetry is that little black console below all the controls that appears while the robot is running
@@ -498,7 +526,14 @@ public class Mecanum_TeleOp extends LinearOpMode {
             //telemetry.addData("Drive", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.addData("Rack and Pinion", "(%.2f)", pinPower);
             telemetry.addData("arm", "Arm (%.2f), Winch (%.2f), Box (%.2f)", armPower, wchPower, boxPower);
-            telemetry.addData("power", "JoystickPower (%.2f)", power);
+            if (driveMode)
+            {
+                telemetry.addData("power", "JoystickPower (%.2f)", power);
+            }
+            else
+            {
+                telemetry.addLine("Left joystick: " + -gamepad1.left_stick_y + ". Right joystick: " + -gamepad1.right_stick_y + ".");
+            }
             /*if (aPressed)
             {
                 telemetry.addLine("A is pressed");
@@ -519,7 +554,27 @@ public class Mecanum_TeleOp extends LinearOpMode {
             {
                 telemetry.addLine("25% Power");
             }
+            else if (sensitivityValue == 10)
+            {
+                telemetry.addLine("10% Power");
+            }
+            if (joystick)
+            {
+                telemetry.addLine("Joystick is being used for power");
+            }
+            else
+            {
+                telemetry.addLine("Joystick is not being used for power");
+            }
             telemetry.addLine("Direction is " + telementryDirection);
+            if (driveMode)
+            {
+                telemetry.addLine("Currently using Mecanum Drive. To switch to the special, magical, fagnificent, easter egg of Tank Drive, press dpad up.");
+            }
+            else
+            {
+                telemetry.addLine("Currently using Tank Drive, to switch back, press dpad down.");
+            }
             telemetry.update();
         }
     }
