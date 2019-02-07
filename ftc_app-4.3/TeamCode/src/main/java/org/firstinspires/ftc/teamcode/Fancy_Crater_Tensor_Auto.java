@@ -9,17 +9,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-// vuforia/tensor imports
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 
 import java.util.List;
 
-//@Disabled
-@Autonomous(name="Crater Unhook w/ Tensor sampling", group="Final")
-public class Crater_Tensor_Auto extends LinearOpMode
+@Disabled
+@Autonomous(name="Fancy Crater Unhook w/ Tensor called", group="Final")
+public class Fancy_Crater_Tensor_Auto extends LinearOpMode
 {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -28,17 +24,6 @@ public class Crater_Tensor_Auto extends LinearOpMode
     double ARM_UP_NINETY = 1.5;
     double ARM_DOWN_NINETY = 0.5;
 
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    private VuforiaLocalizer vuforia;
-
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the Tensor Flow Object
-     * Detection engine.
-     */
-    private TFObjectDetector tfod;
 
     // from here on out all imports and stuff are for motor control
 
@@ -204,7 +189,8 @@ public class Crater_Tensor_Auto extends LinearOpMode
         telemetry.addLine("Rack and pinion is being extended for " + holdTime + "seconds.");
         ElapsedTime holdTimer = new ElapsedTime();
         holdTimer.reset();
-        while (opModeIsActive() && holdTimer.time() < holdTime) {
+        while (opModeIsActive() && holdTimer.time() < holdTime)
+        {
             mPin.setPower(-power);
             mArm.setPower(.33);
         }
@@ -259,16 +245,7 @@ public class Crater_Tensor_Auto extends LinearOpMode
     {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
-        initVuforia();
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector())
-        {
-            initTfod();
-        }
-        else
-        {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -327,136 +304,60 @@ public class Crater_Tensor_Auto extends LinearOpMode
         // current is how many times we've checked and the mineral was silver
         // when current is negative, then we have correctly sampled already and don't need to use the camera anymore
 
-        if (tfod != null)
-        {
-            tfod.activate();
-        }
-
-
+        FancyNickTensor fancyNickTensor = new FancyNickTensor();
+        telemetry.addLine("Mineral sampling commencing");
+        telemetry.update();
         while (state == 2)
         {
-            telemetry.addLine("Mineral sampling commencing");
-            telemetry.update();
-            if (tfod != null)
+            if (fancyNickTensor.getNumberOfRecognitions() == 1)
             {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null)
-                {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    /** ALBERT'S MODIFIED DETECTION: DETECT WHEN ONE OBJECT V0.1 */
-                    if (updatedRecognitions.size() == 0)
-                    {
-                        telemetry.addLine("Found nothing");
-                        throw new IllegalArgumentException("Please get Nick, no minerals were detected. Stop testing.");
-                    }
-                    else if (updatedRecognitions.size() == 1)
-                    { // when detecting one object
-                        for (Recognition recognition : updatedRecognitions)
-                        { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
-                            { // if its a gold mineral
-                                telemetry.addLine("Gold Detected!");
-                                telemetry.update();
-                                pause(0.5);
-                                shift_b(1, 0.25); // hit the gold cube
-                                shift_f(1, 0.25); // realign
-                                for (int i=0; i < 2-current; i++)
-                                { // depending on how many we passed before sucessful sapmling,
-                                    shift_r(1, ONE_FOOT);
-                                }
-                                state ++;
-                            }
-                            else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL))
-                            {
-                                telemetry.addLine("Silver Detected!");
-                                telemetry.update();
-                                current ++;
-                                pause(0.5);
-                                shift_r(1, ONE_FOOT);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        telemetry.addLine("More than one object found");
-                        telemetry.update();
-                        throw new IllegalArgumentException("The number of recognized materials (gold cubes and silver balls) is not one, but it needs to be one for the code to work properly. The number is " + updatedRecognitions.size() + ". This is a FATAL ERROR" + ". Please go to I-Lab Right (or wherever Nick is) and tell him to come. Also, stop testing now.");
-                    }
+                if (fancyNickTensor.returnIfGold())
+                { // if its a gold mineral
+                    telemetry.addLine("Gold Detected!");
                     telemetry.update();
-                    /** END ALBERT'S WEIRD THING */
-
-                    // If needed, plug in the triple tensorflow here.
+                    pause(0.5);
+                    shift_b(1, 0.25); // hit the gold cube
+                    shift_f(1, 0.25); // realign
+                    for (int i = 0; i < 2 - current; i++)
+                    { // depending on how many we passed before sucessful sapmling,
+                        shift_r(1, ONE_FOOT);
+                    }
+                    state++;
                 }
-                else
+                else if (fancyNickTensor.returnIfSilver())
                 {
-                    telemetry.addLine("No objects detected");
+                    telemetry.addLine("Silver Detected!");
                     telemetry.update();
-                    throw new IllegalArgumentException("No new objects were detected, please go get nick to fix stuff.");
+                    current++;
+                    pause(0.5);
+                    shift_r(1, ONE_FOOT);
                 }
             }
             else
             {
-                telemetry.addLine("tfod was not activated...");
+                telemetry.addLine("The number of recognized materials (gold cubes and silver balls) is not one, but it needs to be one for the code to work properly. The number is " + fancyNickTensor.getNumberOfRecognitions() + ".");
                 telemetry.update();
-                break;
+                current++;
+                pause(0.5);
+                shift_r(1, ONE_FOOT);
+                throw new IllegalArgumentException("The number of recognized materials (gold cubes and silver balls) is not one, but it needs to be one for the code to work properly. The number is " + fancyNickTensor.getNumberOfRecognitions() + ". This is a FATAL ERROR");
             }
+
+            /** 3 End of sampling, move to the depot */
+            shift_r(1, ONE_FOOT * 2.08); // shift over until we are at the wall
+            turnLeft(1, 0.5 * NINTEY_DEG); // face back to the wall
+            shift_r(1, ONE_FOOT * 6.25); // go to depo
+            state++;
+
+
+            /** 4 Drop marker */
+            dropMarker(); // drop the marker
+            state++;
+
+            /** 5 Turn around and park to crater */
+
+            shift_l(1, ONE_FOOT * 6.66); // go to crater and park
+            state++;
         }
-
-        if (tfod != null)
-        {
-            tfod.shutdown();
-        }
-
-        /** 3 End of sampling, move to the depot */
-        shift_r(1, ONE_FOOT * 2.08); // shift over until we are at the wall
-        turnLeft(1, 0.5*NINTEY_DEG); // face back to the wall
-        shift_r(1, ONE_FOOT * 6.25); // go to depo
-        state ++;
-
-
-        /** 4 Drop marker */
-        dropMarker(); // drop the marker
-        state ++;
-
-        /** 5 Turn around and park to crater */
-
-        shift_l(1, ONE_FOOT * 6.66); // go to crater and park
-        state ++;
-
-
-
-    }
-
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-    private void initVuforia()
-    {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
-    }
-
-    /**
-     * Initialize the Tensor Flow Object Detection engine.
-     */
-    private void initTfod()
-    {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 }

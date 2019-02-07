@@ -13,13 +13,16 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 //@Disabled
-@Autonomous(name="Tensor (Single)", group="Tensor")
-public class TensorFlowObjectDetectionLivi extends LinearOpMode
+@Autonomous(name="FancyTensor", group="Tensor")
+public class FancyNickTensor extends LinearOpMode
 {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
     private static final String VUFORIA_KEY = "AXintg3/////AAABmfNtfFit30hUjY6OwyDJ+ApUdprK4NLN3D7Fo0PdokHRKNToq2vdRLN6q9SaOptQwr7stamCCbjslhfHa4xoVwA9S5CcAC6JzJZryjK5Epvtv/r9ifHBmEvr4Fe88f1jEye7/vHmfNwiM6sY9BTb59KyeNLxqkCCVKefNfwqGzl7GpGUiZQYbZhRYgxgnA6KbcYa55gQu9Lu0HbuxYgmmeqVUFDhGp6OMAxExRVQ7/jvsx4EXsuc1XAPjzTECzw5RyzrAzfuInK5dNAGVmIzzwucIBxq9y9TLiWKSh2KmVIp/54/Vh6YVD9pGrmRCWUo+pFpcS9m7J9DV4u13BkYqOWFenYmfI/2NymnyI80H50u";
+    private boolean isGold = false;
+    private boolean isSilver = false;
+    private int numberOfRecognitions;
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -57,23 +60,37 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode
                 tfod.activate();
             }
 
-            while (opModeIsActive()) {
-                if (tfod != null) {
+            while (opModeIsActive())
+            {
+                if (tfod != null)
+                {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
+                    if (updatedRecognitions != null)
+                    {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
+                        numberOfRecognitions = updatedRecognitions.size();
                         /** ALBERT'S MODIFIED DETECTION: DETECT WHEN ONE OBJECT V0.1 */
-                        if (updatedRecognitions.size() == 0) {
+                        if (updatedRecognitions.size() == 0)
+                        {
                             telemetry.addLine("Found nothing");
                         }
-                        if (updatedRecognitions.size() == 1) { // when detecting one object
-                            for (Recognition recognition : updatedRecognitions) { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) { // if its a gold mineral
+                        if (updatedRecognitions.size() == 1)
+                        { // when detecting one object
+                            for (Recognition recognition : updatedRecognitions)
+                            { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
+                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                                { // if its a gold mineral
                                     telemetry.addLine("Gold Detected!");
-                                } else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
+                                    isGold = true;
+                                    isSilver = false;
+                                }
+                                else if (recognition.getLabel().equals(LABEL_SILVER_MINERAL))
+                                {
                                     telemetry.addLine("Silver Detected!");
+                                    isGold = false;
+                                    isSilver = true;
                                 }
                             }
                         }
@@ -110,7 +127,8 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode
             }
         }
 
-        if (tfod != null) {
+        if (tfod != null)
+        {
             tfod.shutdown();
         }
     }
@@ -118,7 +136,8 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode
     /**
      * Initialize the Vuforia localization engine.
      */
-    private void initVuforia() {
+    private void initVuforia()
+    {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
@@ -136,11 +155,24 @@ public class TensorFlowObjectDetectionLivi extends LinearOpMode
     /**
      * Initialize the Tensor Flow Object Detection engine.
      */
-    private void initTfod() {
+    private void initTfod()
+    {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
+    public boolean returnIfGold()
+    {
+        return isGold;
+    }
+    public boolean returnIfSilver()
+    {
+        return isSilver;
+    }
+    public int getNumberOfRecognitions()
+    {
+        return numberOfRecognitions;
     }
 }

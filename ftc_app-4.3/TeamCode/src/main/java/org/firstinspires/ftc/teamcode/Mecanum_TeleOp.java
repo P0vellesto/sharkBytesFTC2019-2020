@@ -153,7 +153,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
     }
     protected void armPower(double pinionPower, double boxPower, double armPower, double wchPower)
     {
-        boolean check = false;
+        //boolean check = false;
         mPin.setPower(pinionPower);
         mWch.setPower(wchPower);
         //I dunno if this works. sBox.getPowerFloat(); is something you can do, but i dunno how to work that.
@@ -170,12 +170,12 @@ public class Mecanum_TeleOp extends LinearOpMode {
             else if (boxPower > 0.25)
             {
                 sBox.setPosition(boxPower);
-                check = true;
+                //check = true;
             }
             else if (boxPower < -0.25)
             {
                 sBox.setPosition(boxPower);
-                check = true;
+                //check = true;
             }
         }
 
@@ -220,13 +220,13 @@ public class Mecanum_TeleOp extends LinearOpMode {
         if (armPower > 0.1)
         {
             mArm.setPower(armPower);
-            if (!check)
+            /*if (!check)
             {
                 if (sBox != null)
                 {
                     sBox.setPosition(-armPower);
                 }
-            }
+            }*/
         }
         else if (armPower < -0.1)
         {
@@ -239,26 +239,23 @@ public class Mecanum_TeleOp extends LinearOpMode {
     }
     protected void mecPowerEasy(double dirX, double dirY, double power)
     {
-        boolean turning = false;
         if (gamepad1.right_bumper)
         {
-            turning = true;
             mDrv_l0.setPower(power / sensitivityValue);
             mDrv_l1.setPower(power / sensitivityValue);
             mDrv_r0.setPower(-power / sensitivityValue);
             mDrv_r1.setPower(-power / sensitivityValue);
             telementryDirection = "turningRight";
         }
-        if (gamepad1.left_bumper)
+        else if (gamepad1.left_bumper)
         {
-            turning = true;
             mDrv_l0.setPower(-power / sensitivityValue);
             mDrv_l1.setPower(-power / sensitivityValue);
             mDrv_r0.setPower(power / sensitivityValue);
             mDrv_r1.setPower(power / sensitivityValue);
             telementryDirection = "turningLeft";
         }
-        if (!turning)
+        else
         {
             String direction = evaluateDirection(dirX, dirY);
             if (direction == "forward")
@@ -492,7 +489,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             boxPower = gamepad2.left_stick_x;
 
             wchPower = -gamepad2.right_stick_x;
-            armPower = -gamepad2.right_stick_y/1.5;
+            armPower = -gamepad2.right_stick_y/2;
 
 
             // Send calculated power to wheels

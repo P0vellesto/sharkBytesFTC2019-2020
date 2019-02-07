@@ -309,8 +309,8 @@ public class Depo_Tensor_Auto extends LinearOpMode
          */
 
         // TODO: this
-        double ONE_FOOT = .25;
-        double NINTEY_DEG = 1;
+        double ONE_FOOT = 0.4;
+        double NINTEY_DEG = 0.585;
 
         waitForStart();
 
@@ -347,10 +347,11 @@ public class Depo_Tensor_Auto extends LinearOpMode
                     if (updatedRecognitions.size() == 0)
                     {
                         telemetry.addLine("Found nothing");
+                        throw new IllegalArgumentException("Please get Nick, no minerals were detected. Stop testing.");
                     }
                     if (updatedRecognitions.size() == 1)
                     { // when detecting one object
-                        for (Recognition recognition : updatedRecognitions) // TODO: SHOULDN'T THERE BE ONLY ONE RECOGNITION, shouldn't the recognition be updated every time???
+                        for (Recognition recognition : updatedRecognitions)
                         { // for all one objects we detect (cuz i dont know how to get an item out of this weirdo array)
                             if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                             { // if its a gold mineral
@@ -362,7 +363,6 @@ public class Depo_Tensor_Auto extends LinearOpMode
                                 for (int i=0; i < 2-current; i++)
                                 { // depending on how many we passed before sucessful sapmling,
                                     shift_r(1, ONE_FOOT);
-                                    // TODO: move left one foot
                                 }
                                 state ++;
                             }
@@ -380,6 +380,7 @@ public class Depo_Tensor_Auto extends LinearOpMode
                     {
                         telemetry.addLine("More than one object found");
                         telemetry.update();
+                        throw new IllegalArgumentException("The number of recognized materials (gold cubes and silver balls) is not one, but it needs to be one for the code to work properly. The number is " + updatedRecognitions.size() + ". This is a FATAL ERROR" + ". Please go to I-Lab Right (or wherever Nick is) and tell him to come. Also, stop testing now.");
                     }
                     telemetry.update();
                     /** END ALBERT'S WEIRD THING */
@@ -390,6 +391,7 @@ public class Depo_Tensor_Auto extends LinearOpMode
                 {
                     telemetry.addLine("No objects detected");
                     telemetry.update();
+                    throw new IllegalArgumentException("No new objects were detected, please go get nick to fix stuff.");
                 }
             }
             else
