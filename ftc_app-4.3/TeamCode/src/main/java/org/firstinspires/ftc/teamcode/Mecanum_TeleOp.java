@@ -492,7 +492,7 @@ public class Mecanum_TeleOp extends LinearOpMode {
             boxPower = gamepad2.left_stick_x;
 
             wchPower = -gamepad2.right_stick_x;
-            armPower = -gamepad2.right_stick_y/4;
+            armPower = -gamepad2.right_stick_y/1.5;
 
 
             // Send calculated power to wheels
